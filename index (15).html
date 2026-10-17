@@ -1,0 +1,713 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f5f7fb">
+  <meta name="description" content="Interactive Egypt CPI inflation dashboard">
+  <title>Egypt CPI Inflation Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+:root{
+  --ink:#172b4d;--muted:#687991;--blue:#3267d6;--blue-dark:#204caa;--blue-soft:#eaf1ff;
+  --teal:#3f8f8b;--green:#19866a;--red:#c45151;--line:#e4eaf2;--surface:#fff;--bg:#f5f7fb;
+  --shadow:0 8px 28px rgba(24,43,77,.055);--radius:18px;
+}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font-family:"DM Sans",sans-serif;font-size:14px;line-height:1.5}
+button,input,select{font:inherit}button,select{cursor:pointer}button:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid #9dbaff;outline-offset:2px}
+.app-shell{max-width:1440px;margin:0 auto}.topbar{height:76px;padding:0 clamp(18px,4vw,56px);display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e9edf4;background:rgba(255,255,255,.86)}
+.brand{display:flex;gap:11px;align-items:center;text-decoration:none;color:var(--ink)}.brand-mark{width:42px;height:42px;display:grid;place-items:center;background:var(--blue);color:white;border-radius:13px}.brand-mark svg{width:22px;height:22px}.brand b{display:block;font-family:Manrope,sans-serif;font-size:16px}.brand small{display:block;color:var(--muted);font-size:11px;margin-top:1px}.top-actions{display:flex;align-items:center;gap:9px;color:var(--muted);font-size:12px}.live-dot{width:7px;height:7px;border-radius:50%;background:#2ca782;box-shadow:0 0 0 4px #e0f5ed}
+main{padding:32px clamp(16px,4vw,56px) 24px}.intro{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:25px}.eyebrow{font-size:10px;letter-spacing:1.55px;font-weight:700;color:var(--blue);margin:0 0 7px}.intro h1{font:800 clamp(27px,3vw,38px)/1.18 Manrope,sans-serif;letter-spacing:-1.2px;margin:0}.subtitle,.section-note{color:var(--muted);margin:8px 0 0;font-size:13px}.latest-pill{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);padding:10px 13px;border-radius:12px;white-space:nowrap;color:var(--muted);font-size:12px}.latest-pill svg{width:16px;color:var(--blue)}.latest-pill b{color:var(--ink);font-size:12px}
+.overview-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;margin-bottom:38px}.metric-card{min-width:0;padding:20px 20px 17px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.metric-primary{border-top:3px solid var(--blue);padding-top:18px}.metric-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;color:var(--muted);font-size:12px;font-weight:600}.metric-icon{width:31px;height:31px;display:grid;place-items:center;border-radius:10px;background:var(--blue-soft);color:var(--blue);flex-shrink:0}.metric-icon svg{width:16px;height:16px}.metric-value{font:800 clamp(27px,2.6vw,35px)/1.25 Manrope,sans-serif;letter-spacing:-1px;margin:12px 0 13px;font-variant-numeric:tabular-nums}.metric-foot{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;color:var(--muted);font-size:11px}.change-chip{padding:3px 7px;border-radius:20px;background:#eef7f3;color:var(--green);font-weight:700}.change-chip.negative{background:#fff0f0;color:var(--red)}.contributor-name{font:700 16px/1.35 Manrope,sans-serif;min-height:43px;margin:13px 0 9px;overflow-wrap:anywhere}.muted{color:var(--muted)}
+.section-block{margin:0 0 39px}.section-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:17px}.section-heading h2,.modal-header h2{font:800 21px/1.25 Manrope,sans-serif;letter-spacing:-.45px;margin:0}.section-heading .eyebrow{margin-bottom:5px}.button{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid transparent;border-radius:11px;padding:10px 14px;font-weight:700;font-size:12px;transition:.18s ease}.button svg{width:16px;height:16px}.button-secondary{background:white;color:var(--blue);border-color:#d8e3f8}.button-secondary:hover{background:var(--blue-soft)}.panel{background:white;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}.hidden{display:none!important}.chart-wrap{position:relative;width:100%;min-width:0}
+.small-control{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:11px}.small-control select,.field select{border:1px solid var(--line);background:white;color:var(--ink);border-radius:9px;padding:9px 11px;max-width:100%;min-width:0}
+.category-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.category-card{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 4px 18px rgba(24,43,77,.035);min-width:0;overflow:hidden;transition:border-color .18s,box-shadow .18s}.category-card:hover,.category-card.expanded{border-color:#b8cbf5;box-shadow:0 8px 25px rgba(39,86,173,.09)}.category-top{padding:17px 17px 13px;cursor:pointer;outline:none}.category-title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.category-name{font:700 12px/1.45 Manrope,sans-serif;text-transform:uppercase;letter-spacing:.1px;min-height:35px;max-width:calc(100% - 38px)}.category-weight{color:var(--muted);font-size:11px;white-space:nowrap}.category-metrics{display:grid;grid-template-columns:1fr 1fr;margin-top:13px}.category-metric{min-width:0}.category-metric+ .category-metric{border-left:1px solid var(--line);padding-left:15px}.category-metric strong{display:block;font:800 26px/1.2 Manrope,sans-serif;letter-spacing:-.7px;font-variant-numeric:tabular-nums}.category-metric span{display:block;color:var(--muted);font-size:11px;margin-top:3px}.category-card-actions{display:flex;align-items:center;justify-content:space-between;padding:0 17px 14px;gap:8px}.history-button{display:inline-flex;align-items:center;gap:5px;border:0;background:var(--blue-soft);color:var(--blue-dark);font-weight:700;font-size:11px;border-radius:8px;padding:7px 10px}.history-button svg{width:13px;height:13px}.expand-hint{color:#8390a4;font-size:11px;display:flex;align-items:center;gap:5px}.expand-hint svg{width:14px;height:14px;transition:transform .2s}.category-card.expanded .expand-hint svg{transform:rotate(180deg)}
+.category-details{border-top:1px solid var(--line);padding:12px 12px 14px;background:#fbfcff}.detail-toolbar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 3px 9px}.detail-toolbar label{font-size:10px;color:var(--muted)}.detail-toolbar select{max-width:62%;font-size:10px;padding:6px;border:1px solid var(--line);border-radius:7px;background:#fff;color:var(--ink)}.detail-table-wrap{overflow:auto;max-height:270px;border:1px solid var(--line);border-radius:9px;background:white}.detail-table{border-collapse:collapse;width:100%;font-size:11px}.detail-table th{position:sticky;top:0;background:#f5f8fd;color:var(--muted);font-weight:700;text-align:right;white-space:nowrap}.detail-table th:first-child,.detail-table td:first-child{text-align:left;min-width:145px;max-width:220px}.detail-table td,.detail-table th{padding:9px 8px;border-bottom:1px solid #edf0f5}.detail-table tr:last-child td{border-bottom:0}.detail-table td:not(:first-child){text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}.negative-value{color:var(--green)}.positive-value{color:var(--ink)}
+.analysis-panel{padding:22px}.control-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px}.field{display:flex;flex-direction:column;gap:6px;min-width:0}.field label{font-size:11px;font-weight:700;color:var(--muted)}.field select{width:100%;font-size:12px}.chart-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:20px 0 13px}.range-buttons{display:flex;gap:5px;flex-wrap:wrap}.range-buttons button{background:#f5f7fb;border:1px solid transparent;color:var(--muted);border-radius:8px;padding:7px 10px;font-size:11px;font-weight:700}.range-buttons button.active{background:var(--blue-soft);color:var(--blue-dark);border-color:#d8e3fb}.range-label{font-size:11px;color:var(--muted);text-align:right}.contribution-chart-wrap{height:430px}.chart-footnote{margin-top:12px;color:var(--muted);font-size:11px;line-height:1.6}
+.method-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.method-card{background:white;border:1px solid var(--line);border-radius:15px;padding:19px}.method-icon{width:34px;height:34px;display:grid;place-items:center;background:#edf3ff;color:var(--blue);border-radius:10px}.method-icon svg{width:17px}.method-card h3{font:700 13px Manrope,sans-serif;margin:13px 0 7px}.method-card p{color:var(--muted);font-size:12px;line-height:1.7;margin:0}
+footer{border-top:1px solid var(--line);padding:19px 0 4px;display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:11px}
+.icon-button{display:grid;place-items:center;width:35px;height:35px;background:white;border:1px solid var(--line);border-radius:10px;color:var(--muted)}.icon-button svg{width:16px;height:16px}.icon-button:hover{color:var(--blue);border-color:#c5d5f6}
+.modal{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:18px}.modal-backdrop{position:absolute;inset:0;background:rgba(14,27,49,.44);backdrop-filter:blur(3px)}.modal-card{position:relative;z-index:1;width:min(980px,100%);max-height:92vh;overflow:auto;background:white;border-radius:20px;padding:24px;box-shadow:0 24px 80px rgba(12,29,58,.25)}.modal-header{display:flex;justify-content:space-between;align-items:flex-start;gap:20px}.history-chart-wrap{height:340px}.toast{position:fixed;bottom:22px;left:50%;transform:translate(-50%,20px);opacity:0;pointer-events:none;z-index:40;padding:11px 16px;background:#203653;color:white;border-radius:10px;box-shadow:var(--shadow);font-size:12px;transition:.2s;max-width:calc(100% - 28px)}.toast.show{opacity:1;transform:translate(-50%,0)}.loading-card,.error-card{padding:28px;border-radius:14px;background:white;color:var(--muted);border:1px solid var(--line);grid-column:1/-1}.error-card{color:var(--red)}
+@media(max-width:1050px){.overview-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.category-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.category-name{font-size:11px}}
+@media(max-width:650px){.topbar{height:64px;padding:0 16px}.brand-mark{width:36px;height:36px;border-radius:11px}.brand b{font-size:14px}.brand small{font-size:10px}.top-actions{gap:7px}.status-text{max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px}.icon-button{width:32px;height:32px}main{padding:24px 13px 20px}.intro{display:block;margin-bottom:20px}.intro h1{font-size:29px}.subtitle{font-size:12px;max-width:320px}.latest-pill{margin-top:16px;width:max-content}.overview-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-bottom:32px}.metric-card{padding:14px 12px 12px;border-radius:14px}.metric-primary{padding-top:12px}.metric-heading{font-size:10px;align-items:flex-start}.metric-icon{width:27px;height:27px;border-radius:8px}.metric-icon svg{width:14px}.metric-value{font-size:27px;margin:10px 0}.metric-foot{font-size:9px;align-items:flex-start}.change-chip{font-size:9px}.contributor-name{font-size:13px;min-height:35px;margin:10px 0 8px}.section-block{margin-bottom:31px}.section-heading{align-items:flex-start;flex-direction:column;gap:12px}.section-heading h2,.modal-header h2{font-size:19px}.section-note{font-size:11px}.button{padding:9px 11px}.small-control{width:100%;justify-content:space-between}.small-control select{flex:1;max-width:70%}.category-grid{grid-template-columns:1fr;gap:10px}.category-top{padding:15px 15px 12px}.category-name{font-size:12px;min-height:0;max-width:72%}.category-metrics{margin-top:12px}.category-metric strong{font-size:25px}.category-card-actions{padding:0 15px 13px}.analysis-panel{padding:14px}.control-grid{grid-template-columns:1fr;gap:11px}.chart-toolbar{align-items:flex-start;flex-direction:column;margin:16px 0 10px}.range-buttons{gap:4px}.range-buttons button{padding:7px 8px;font-size:10px}.range-label{text-align:left}.contribution-chart-wrap{height:330px}.method-grid{grid-template-columns:1fr;gap:10px}.method-card{padding:16px}.method-card h3{margin-top:10px}footer{font-size:10px;flex-direction:column;gap:3px}.modal{padding:8px;align-items:flex-end}.modal-card{padding:17px;border-radius:18px 18px 10px 10px;max-height:94vh}.history-chart-wrap{height:320px}.detail-table th:first-child,.detail-table td:first-child{min-width:135px}.detail-table td,.detail-table th{padding:8px 7px}}
+.commentary-card{padding:24px 26px;border-top:3px solid var(--blue)}.commentary-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:18px}.commentary-head h2{font:800 19px/1.35 Manrope,sans-serif;letter-spacing:-.35px;margin:0}.commentary-head .eyebrow{margin-bottom:6px}.commentary-period{background:var(--blue-soft);color:var(--blue-dark);font-size:11px;font-weight:700;padding:5px 10px;border-radius:20px;white-space:nowrap}.commentary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px 22px}.commentary-item{border-left:2px solid var(--line);padding-left:13px;min-width:0}.commentary-item b{display:block;font:700 11px/1.4 Manrope,sans-serif;text-transform:uppercase;letter-spacing:.6px;color:var(--blue);margin-bottom:4px}.commentary-item p{margin:0;color:var(--ink);font-size:13px;line-height:1.6}
+@media(max-width:650px){.commentary-card{padding:18px 16px}.commentary-head{flex-direction:column;gap:10px}.commentary-head h2{font-size:17px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+.contrib-stats{display:grid;grid-template-columns:1fr 1fr;margin:2px 0 11px}.contrib-stats>div{min-width:0}.contrib-stats>div+div{border-left:1px solid var(--line);padding-left:13px}.contrib-stats strong{display:block;font:800 21px/1.25 Manrope,sans-serif;letter-spacing:-.5px;font-variant-numeric:tabular-nums}.contrib-stats span{display:block;color:var(--muted);font-size:10px;margin-top:2px}
+.trend-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.trend-card{padding:22px 22px 14px;min-width:0}.trend-card h3{font:700 16px/1.3 Manrope,sans-serif;margin:0 0 14px}.trend-chart-wrap{height:300px}
+.detail-table tr.sub-row td{background:#f3f6fc;font-weight:700;color:var(--ink)}.detail-table td.indent{padding-left:16px}
+.history-controls{display:grid;grid-template-columns:minmax(180px,260px);margin-top:20px}
+@media(max-width:1050px){.trend-grid{grid-template-columns:1fr}}
+@media(max-width:650px){.trend-grid{gap:12px}.trend-card{padding:16px 14px 10px}.trend-chart-wrap{height:250px}.contrib-stats strong{font-size:17px}.contrib-stats>div+div{padding-left:9px}.contrib-stats span{font-size:9px}}
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Egypt CPI dashboard home">
+        <span class="brand-mark"><i data-lucide="chart-no-axes-combined"></i></span>
+        <span><b>Egypt CPI</b><small>Inflation dashboard</small></span>
+      </a>
+      <div class="top-actions">
+        <span class="live-dot"></span><span id="dataStatus" class="status-text">Connecting to data…</span>
+        <button id="refreshBtn" class="icon-button" title="Refresh data" aria-label="Refresh data"><i data-lucide="refresh-cw"></i></button>
+      </div>
+    </header>
+
+    <main>
+      <section class="intro">
+        <div>
+          <p class="eyebrow">MACROECONOMIC MONITOR</p>
+          <h1>Inflation at a glance</h1>
+          <p class="subtitle">Egypt's consumer price index, trends and inflation contributions.</p>
+        </div>
+        <div class="latest-pill"><i data-lucide="calendar-days"></i><span>Latest month</span><b id="latestMonth">—</b></div>
+      </section>
+
+      <section class="overview-grid" aria-label="Latest inflation indicators">
+        <article class="metric-card metric-primary">
+          <div class="metric-heading"><span>Headline inflation · YoY</span><span class="metric-icon"><i data-lucide="trending-up"></i></span></div>
+          <div class="metric-value" id="headlineYoY">—</div>
+          <div class="metric-foot"><span id="headlineYoYPrev">Previous month: —</span><span id="headlineYoYChange" class="change-chip">—</span></div>
+        </article>
+        <article class="metric-card">
+          <div class="metric-heading"><span>Headline inflation · MoM</span><span class="metric-icon"><i data-lucide="calendar-range"></i></span></div>
+          <div class="metric-value" id="headlineMoM">—</div>
+          <div class="metric-foot"><span id="headlineMoMPrev">Previous month: —</span><span id="headlineMoMChange" class="change-chip">—</span></div>
+        </article>
+        <article class="metric-card contributor-card">
+          <div class="metric-heading"><span>Top contributor · YoY</span><span class="metric-icon"><i data-lucide="award"></i></span></div>
+          <div class="contributor-name" id="topYoYName">—</div>
+          <div class="contrib-stats">
+            <div><strong id="topYoYValue">—</strong><span>Latest month</span></div>
+            <div><strong id="topYoYAvg">—</strong><span>6-month average</span></div>
+          </div>
+        </article>
+        <article class="metric-card contributor-card">
+          <div class="metric-heading"><span>Top contributor · MoM</span><span class="metric-icon"><i data-lucide="zap"></i></span></div>
+          <div class="contributor-name" id="topMoMName">—</div>
+          <div class="contrib-stats">
+            <div><strong id="topMoMValue">—</strong><span>Latest month</span></div>
+            <div><strong id="topMoMAvg">—</strong><span>6-month average</span></div>
+          </div>
+        </article>
+      </section>
+
+      <section class="section-block" id="commentarySection">
+        <article class="panel commentary-card">
+          <div class="commentary-head">
+            <div><p class="eyebrow">MONTHLY COMMENTARY</p><h2 id="commentaryHeadline"></h2></div>
+            <span class="commentary-period" id="commentaryPeriod"></span>
+          </div>
+          <div class="commentary-grid" id="commentaryGrid"></div>
+        </article>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <div><p class="eyebrow">HEADLINE TREND</p><h2>Headline inflation history</h2><p class="section-note">Urban All Items inflation calculated directly from the CPI index points.</p></div>
+        </div>
+        <div class="trend-grid">
+          <article class="panel trend-card"><h3>Year-on-year (YoY)</h3><div class="chart-wrap trend-chart-wrap"><canvas id="trendYoY" aria-label="Headline YoY inflation line chart"></canvas></div></article>
+          <article class="panel trend-card"><h3>Month-on-month (MoM)</h3><div class="chart-wrap trend-chart-wrap"><canvas id="trendMoM" aria-label="Headline MoM inflation line chart"></canvas></div></article>
+        </div>
+      </section>
+
+      <section class="section-block">
+        <div class="section-heading">
+          <div><p class="eyebrow">LATEST READINGS</p><h2>Inflation by category</h2><p class="section-note">Tap a card on mobile, or hover on desktop, to inspect underlying items.</p></div>
+          <div class="small-control"><label for="categorySort">Sort cards</label><select id="categorySort"><option value="source">Source order</option><option value="yoy-desc">YoY · highest first</option><option value="yoy-asc">YoY · lowest first</option><option value="mom-desc">MoM · highest first</option><option value="mom-asc">MoM · lowest first</option><option value="weight-desc">Weight · highest first</option></select></div>
+        </div>
+        <div id="categoryGrid" class="category-grid"><div class="loading-card">Loading category data…</div></div>
+      </section>
+
+      <section class="section-block" id="contributionSection">
+        <div class="section-heading">
+          <div><p class="eyebrow">WHAT IS DRIVING INFLATION?</p><h2>Contribution analysis</h2><p class="section-note">Compare each component's contribution in percentage points with the aggregate inflation rate.</p></div>
+        </div>
+        <div class="panel analysis-panel">
+          <div class="control-grid">
+            <div class="field"><label for="contributionMeasure">Inflation measure</label><select id="contributionMeasure"><option value="yoy">Year-on-year (YoY)</option><option value="mom">Month-on-month (MoM)</option></select></div>
+            <div class="field"><label for="contributionLevel">Breakdown level</label><select id="contributionLevel"><option value="main">Main categories · headline</option><option value="selected">Selected categories</option></select></div>
+            <div class="field hidden" id="parentSelectWrap"><label for="parentSelect">Category</label><select id="parentSelect"></select></div>
+          </div>
+          <div class="chart-toolbar">
+            <div class="range-buttons" role="group" aria-label="Chart date range">
+              <button data-range="6">6 months</button><button data-range="12" class="active">1 year</button><button data-range="24">2 years</button><button data-range="all">All data</button>
+            </div>
+            <div class="range-label" id="rangeLabel">—</div>
+          </div>
+          <div class="chart-wrap contribution-chart-wrap"><canvas id="contributionChart" aria-label="Stacked contribution chart"></canvas></div>
+          <div class="chart-footnote" id="contributionNote"></div>
+        </div>
+      </section>
+
+      <footer><span>Egypt CPI Inflation Dashboard</span><span id="updatedAt">Data source: GitHub CSV</span></footer>
+    </main>
+  </div>
+
+  <div id="historyModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="historyTitle">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-card">
+      <div class="modal-header"><div><p class="eyebrow">HISTORICAL SERIES</p><h2 id="historyTitle">Category history</h2><p id="historySubtitle" class="section-note"></p></div><button class="icon-button" data-close-modal aria-label="Close historical chart"><i data-lucide="x"></i></button></div>
+      <div class="history-controls">
+        <div class="field"><label for="historyMeasure">Measure</label><select id="historyMeasure"><option value="yoy">YoY inflation</option><option value="mom">MoM inflation</option></select></div>
+      </div>
+      <div class="chart-toolbar"><div class="range-buttons history-ranges"><button data-range="6">6 months</button><button data-range="12" class="active">1 year</button><button data-range="24">2 years</button><button data-range="all">All data</button></div><div id="historyRangeLabel" class="range-label"></div></div>
+      <div class="chart-wrap history-chart-wrap"><canvas id="historyChart" aria-label="Historical inflation line chart"></canvas></div>
+    </div>
+  </div>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script>
+(() => {
+"use strict";
+
+/* ------------------------------------------------------------------ *
+ *  Configuration
+ * ------------------------------------------------------------------ */
+const DATA_URL = "https://raw.githubusercontent.com/o-elkaraksy/Inflation_dashboard_OCT2026/refs/heads/main/dashboard_data.csv";
+
+// Colours are assigned by source order so a category keeps its colour across views.
+const PALETTE = ["#3f7c75","#d3a46b","#8a9f78","#b97d86","#a7aaa0","#7f94ab","#c6ae85","#6f93b8","#b5855c","#9b8bb9","#5aa89a","#c98f6a"];
+const LINE_BLUE = "#0b559f";
+const LINE_ORANGE = "#f28c28";
+const INK = "#172b4d";
+const MUTED = "#77859a";
+
+// Categories offered in "Selected categories" (matched by name, with fallback to the numeric key).
+const SELECTED_MATCHERS = [/^food/i, /^housing/i];
+const SELECTED_FALLBACK_KEYS = ["1", "4"];
+
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sept","Oct","Nov","Dec"];
+
+/* ================================================================== *
+ *  MONTHLY COMMENTARY  —  EDIT THIS BLOCK EACH MONTH
+ *  Update `period`, `headline` and the `text` of each point below.
+ *  (Add, remove or rename points freely; the card adapts automatically.)
+ * ================================================================== */
+const COMMENTARY = {
+  period: "[Month Year]",
+  headline: "[One-sentence summary of this month's inflation reading.]",
+  points: [
+    { label: "Latest move",          text: "[How headline YoY and MoM changed versus the previous month.]" },
+    { label: "Main driver",          text: "[Which category contributed the most this month and by how many pp.]" },
+    { label: "Versus earlier months", text: "[How this month's drivers are similar to or different from earlier readings.]" },
+    { label: "Last 6 months",        text: "[Brief comment on the inflation trajectory over the past six months.]" },
+    { label: "Outlook",              text: "[Brief view on the expected trajectory in the coming months.]" }
+  ]
+};
+/* ============================ END COMMENTARY ============================ */
+
+function renderCommentary() {
+  $("commentaryPeriod").textContent = COMMENTARY.period;
+  $("commentaryHeadline").textContent = COMMENTARY.headline;
+  $("commentaryGrid").innerHTML = COMMENTARY.points
+    .map(p => `<div class="commentary-item"><b>${escapeHtml(p.label)}</b><p>${escapeHtml(p.text)}</p></div>`).join("");
+}
+
+const $ = id => document.getElementById(id);
+const state = {
+  rows: [], dates: [], latestIndex: -1,
+  trendCharts: {}, contributionChart: null, historyChart: null,
+  historyCategory: null, historyRange: 12, contributionRange: 12,
+  expanded: new Set(), sorts: {}
+};
+
+/* ------------------------------------------------------------------ *
+ *  Formatting helpers (everything displayed uses 1 decimal place)
+ * ------------------------------------------------------------------ */
+const r1 = n => { const v = Math.round(n * 10) / 10; return (v === 0 ? 0 : v).toFixed(1); };
+const pct = n => Number.isFinite(n) ? `${r1(n)}%` : "—";
+const pp  = n => Number.isFinite(n) ? `${r1(n)} pp` : "—";
+const num = v => { if (v === null || v === undefined || String(v).trim() === "") return null; const n = Number(String(v).replace(/,/g, "")); return Number.isFinite(n) ? n : null; };
+const escapeHtml = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const monthLabel = d => `${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+
+function displayName(raw) {
+  let s = String(raw ?? "").replace(/_/g, " ").replace(/\s*,\s*/g, ", ").replace(/\s+/g, " ").trim();
+  const letters = s.replace(/[^A-Za-z]/g, "");
+  if (letters && letters === letters.toUpperCase()) s = s.toLowerCase();
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+function toast(message) {
+  const el = $("toast"); el.textContent = message; el.classList.add("show");
+  setTimeout(() => el.classList.remove("show"), 2800);
+}
+function setStatus(text, ok = true) {
+  $("dataStatus").textContent = text;
+  const dot = document.querySelector(".live-dot");
+  if (dot) dot.style.background = ok ? "#2ca782" : "#c45151";
+}
+function icons() { if (window.lucide) window.lucide.createIcons(); }
+
+/* ------------------------------------------------------------------ *
+ *  Data model
+ * ------------------------------------------------------------------ */
+function parseDate(label) {
+  const m = String(label).trim().match(/^([A-Za-z]{3})-(\d{2}|\d{4})$/);
+  if (!m) return null;
+  const months = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+  if (!(m[1] in months)) return null;
+  let y = Number(m[2]); if (y < 100) y += 2000;
+  return new Date(y, months[m[1]], 1);
+}
+
+function normalizeRow(raw, idx) {
+  const family = String(raw.family || "").trim();
+  const name = String(raw.name || "").trim();
+  const low = family.toLowerCase();
+  let kind = "other";
+  if (name.toLowerCase() === "all items") kind = "all";
+  else if (low.startsWith("main category")) kind = "main";
+  else if (low.startsWith("sub category")) kind = "sub";
+  else if (low.startsWith("sub item")) kind = "item";
+  const m = family.match(/(\d+(?:\.\d+)?)/);
+  const key = m ? m[1] : "";
+  return { idx, family, name, label: displayName(name), kind, key, mainKey: key.split(".")[0],
+           weight: raw.weight, subWeight: raw.subWeight, values: raw.values };
+}
+
+const getMainRows = () => state.rows.filter(r => r.kind === "main");
+const getAllRow = () => state.rows.find(r => r.kind === "all");
+// Sub-items only (intermediate "sub category" rows are excluded to avoid double counting).
+const getChildRows = main => state.rows.filter(r => r.kind === "item" && r.mainKey === main.key);
+const getKids = main => state.rows.filter(r => (r.kind === "sub" || r.kind === "item") && r.mainKey === main.key);
+
+function selectedParents() {
+  const mains = getMainRows();
+  const picked = SELECTED_MATCHERS.map(re => mains.find(r => re.test(r.name))).filter(Boolean);
+  return picked.length ? picked : mains.filter(r => SELECTED_FALLBACK_KEYS.includes(r.key));
+}
+
+const indexFor = (row, idx) => row.values[idx] ?? null;
+const backOf = period => period === "yoy" ? 12 : 1;
+const firstIndex = period => backOf(period);
+
+function inflation(row, idx, period) {
+  const back = backOf(period);
+  if (idx < back) return null;
+  const a = indexFor(row, idx), b = indexFor(row, idx - back);
+  if (a === null || b === null || b === 0) return null;
+  return (a / b - 1) * 100;
+}
+const rate = (row, period, idx = state.latestIndex) => inflation(row, idx, period);
+
+/** Contribution in percentage points: weight x change in component index / previous-period index of the aggregate. */
+function contribPP(row, baseRow, weight, period, idx) {
+  const back = backOf(period);
+  if (idx < back || !baseRow) return null;
+  const cur = indexFor(row, idx), prev = indexFor(row, idx - back), base = indexFor(baseRow, idx - back);
+  if (cur === null || prev === null || base === null || base === 0) return null;
+  return Math.max(0, weight ?? 0) * (cur - prev) / base * 100;
+}
+const mainContrib  = (row, period, idx) => contribPP(row, getAllRow(), row.weight, period, idx);
+const childContrib = (row, parent, period, idx) => contribPP(row, parent, row.subWeight, period, idx);
+
+function rangeStart(range, period) {
+  const lo = firstIndex(period);
+  if (range === "all") return lo;
+  return Math.max(lo, state.latestIndex - Number(range) + 1);
+}
+
+/* ------------------------------------------------------------------ *
+ *  Shared chart helpers
+ * ------------------------------------------------------------------ */
+function applyChartDefaults() {
+  Chart.defaults.font.family = '"DM Sans", system-ui, sans-serif';
+  Chart.defaults.color = MUTED;
+}
+
+/** Tick callback that shows every n-th label so labels never collide. anchor: "end" keeps the latest month labelled. */
+function sparseTicks({ labelW, minStep = 1, maxLabels = null, anchor = "end" }) {
+  return function (value, index) {
+    const n = this.chart.data.labels.length;
+    const slot = (this.width || this.chart.width || 300) / Math.max(1, n);
+    let step = Math.max(minStep, Math.ceil(labelW / slot));
+    if (maxLabels) step = Math.max(step, Math.ceil(n / maxLabels));
+    // Always label the first and last month; intermediate labels keep a step away from both ends so nothing collides.
+    if (index === 0 || index === n - 1) return this.getLabelForValue(value);
+    const pos = anchor === "end" ? (n - 1 - index) : index;
+    const gapFirst = index, gapLast = n - 1 - index;
+    return (pos % step === 0 && gapFirst >= step && gapLast >= step) ? this.getLabelForValue(value) : "";
+  };
+}
+
+const crosshairPlugin = {
+  id: "crosshair",
+  afterDatasetsDraw(chart) {
+    const active = chart.tooltip && chart.tooltip.getActiveElements ? chart.tooltip.getActiveElements() : [];
+    if (!active.length) return;
+    const { ctx, chartArea } = chart, x = active[0].element.x;
+    ctx.save(); ctx.strokeStyle = "rgba(23,43,77,.28)"; ctx.lineWidth = 1; ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.moveTo(x, chartArea.top); ctx.lineTo(x, chartArea.bottom); ctx.stroke(); ctx.restore();
+  }
+};
+
+/** Single-series line chart with hover readings (used by the headline trend cards and the category history). */
+function makeLineChart(canvas, existing, { labels, data, color, seriesName, axisTitle, tickOpts }) {
+  if (existing) existing.destroy();
+  return new Chart(canvas, {
+    type: "line",
+    plugins: [crosshairPlugin],
+    data: { labels, datasets: [{
+      label: seriesName, data, borderColor: color, backgroundColor: color, borderWidth: 2.6,
+      pointRadius: 0, pointHoverRadius: 5, pointHoverBackgroundColor: "#fff", pointHoverBorderColor: color, pointHoverBorderWidth: 2.5,
+      cubicInterpolationMode: "monotone", spanGaps: false, fill: false
+    }]},
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      interaction: { mode: "index", intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          displayColors: false, padding: 10, backgroundColor: "rgba(23,43,77,.94)", titleFont: { weight: "600" },
+          callbacks: { label: c => `${seriesName}: ${pct(c.raw)}` }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, border: { color: "#dfe6ef" }, ticks: { autoSkip: false, maxRotation: 0, color: MUTED, font: { size: 10 }, callback: sparseTicks(tickOpts) } },
+        y: { title: { display: true, text: axisTitle, color: MUTED, font: { size: 10 } }, grid: { color: "#edf1f6" }, border: { display: false },
+             ticks: { color: MUTED, font: { size: 10 }, callback: v => `${r1(v)}%` } }
+      }
+    }
+  });
+}
+
+/* ------------------------------------------------------------------ *
+ *  1) Overview cards  (top contributors with 6-month average, 1 decimal)
+ * ------------------------------------------------------------------ */
+function changeChip(current, previous) {
+  if (!Number.isFinite(current) || !Number.isFinite(previous)) return "—";
+  const d = current - previous;
+  return `${d > 0 ? "+" : ""}${r1(d)} pp`;
+}
+function setChange(id, current, previous) {
+  const el = $(id); el.textContent = changeChip(current, previous);
+  el.classList.toggle("negative", Number.isFinite(current) && Number.isFinite(previous) && current < previous);
+}
+
+function populateOverview() {
+  const all = getAllRow(); if (!all) return;
+  const L = state.latestIndex;
+  const yoy = rate(all, "yoy"), mom = rate(all, "mom");
+  const py = L > 0 ? inflation(all, L - 1, "yoy") : null, pm = L > 0 ? inflation(all, L - 1, "mom") : null;
+  $("headlineYoY").textContent = pct(yoy); $("headlineMoM").textContent = pct(mom);
+  $("headlineYoYPrev").textContent = `Previous month: ${pct(py)}`; $("headlineMoMPrev").textContent = `Previous month: ${pct(pm)}`;
+  setChange("headlineYoYChange", yoy, py); setChange("headlineMoMChange", mom, pm);
+  $("latestMonth").textContent = monthLabel(state.dates[L]);
+
+  const mains = getMainRows();
+  for (const period of ["yoy", "mom"]) {
+    const ranked = mains.map(row => ({ row, c: mainContrib(row, period, L) })).filter(x => Number.isFinite(x.c)).sort((a, b) => b.c - a.c);
+    const top = ranked[0];
+    const p = period === "yoy" ? "topYoY" : "topMoM";
+    $(`${p}Name`).textContent = top ? top.row.label : "—";
+    $(`${p}Value`).textContent = top ? pp(top.c) : "—";
+    let avg = null;
+    if (top) {
+      const vals = [];
+      for (let i = Math.max(backOf(period), L - 5); i <= L; i++) { const v = mainContrib(top.row, period, i); if (Number.isFinite(v)) vals.push(v); }
+      if (vals.length) avg = vals.reduce((s, v) => s + v, 0) / vals.length;
+    }
+    $(`${p}Avg`).textContent = pp(avg);
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ *  2) Headline YoY / MoM line charts
+ * ------------------------------------------------------------------ */
+function buildTrendCharts() {
+  const all = getAllRow(); if (!all) return;
+  const start = firstIndex("yoy"), labels = [], yoy = [], mom = [];
+  for (let i = start; i <= state.latestIndex; i++) {
+    labels.push(monthLabel(state.dates[i])); yoy.push(inflation(all, i, "yoy")); mom.push(inflation(all, i, "mom"));
+  }
+  const tickOpts = { labelW: 88, anchor: "end" };
+  state.trendCharts.yoy = makeLineChart($("trendYoY"), state.trendCharts.yoy, { labels, data: yoy, color: LINE_BLUE, seriesName: "YoY inflation", axisTitle: "YoY inflation (%)", tickOpts });
+  state.trendCharts.mom = makeLineChart($("trendMoM"), state.trendCharts.mom, { labels, data: mom, color: LINE_ORANGE, seriesName: "MoM inflation", axisTitle: "MoM inflation (%)", tickOpts });
+}
+
+/* ------------------------------------------------------------------ *
+ *  3) Category cards. Sub-categories stay fixed; only the sub-items beneath them are sorted.
+ * ------------------------------------------------------------------ */
+function comparator(sortKey) {
+  const y = r => rate(r, "yoy"), m = r => rate(r, "mom");
+  switch (sortKey) {
+    case "yoy-desc":    return (a, b) => (y(b) ?? -Infinity) - (y(a) ?? -Infinity);
+    case "yoy-asc":     return (a, b) => (y(a) ?? Infinity) - (y(b) ?? Infinity);
+    case "mom-desc":    return (a, b) => (m(b) ?? -Infinity) - (m(a) ?? -Infinity);
+    case "mom-asc":     return (a, b) => (m(a) ?? Infinity) - (m(b) ?? Infinity);
+    case "weight-desc": return (a, b) => (b.subWeight || 0) - (a.subWeight || 0);
+    default:            return (a, b) => a.idx - b.idx;
+  }
+}
+
+function detailRows(main, sortKey) {
+  const kids = getKids(main), cmp = comparator(sortKey);
+  const subs = kids.filter(r => r.kind === "sub").sort((a, b) => a.idx - b.idx);
+  const items = kids.filter(r => r.kind === "item");
+  if (!subs.length) return items.slice().sort(cmp).map(row => ({ row, level: 0 }));
+  const out = [], used = new Set();
+  subs.forEach(sub => {
+    out.push({ row: sub, level: 0, isSub: true });
+    items.filter(i => i.key === sub.key).sort(cmp).forEach(i => { used.add(i); out.push({ row: i, level: 1 }); });
+  });
+  items.filter(i => !used.has(i)).sort(cmp).forEach(row => out.push({ row, level: 0 }));
+  return out;
+}
+
+const valueClass = v => (v ?? 0) < 0 ? "negative-value" : "positive-value";
+
+function detailHtml(main) {
+  const sortKey = state.sorts[main.idx] || "source";
+  const rows = detailRows(main, sortKey);
+  if (!rows.length) return `<div class="category-details"><p class="section-note">No child rows were found for this category.</p></div>`;
+  const hasSubs = rows.some(r => r.isSub);
+  const opt = (v, t) => `<option value="${v}" ${sortKey === v ? "selected" : ""}>${t}</option>`;
+  const body = rows.map(({ row, level, isSub }) => {
+    const y = rate(row, "yoy"), m = rate(row, "mom");
+    return `<tr class="${isSub ? "sub-row" : ""}"><td class="${level ? "indent" : ""}">${level ? "↳ " : ""}${escapeHtml(row.label)}</td><td>${pct((row.subWeight || 0) * 100)}</td><td class="${valueClass(y)}">${pct(y)}</td><td class="${valueClass(m)}">${pct(m)}</td></tr>`;
+  }).join("");
+  return `<div class="category-details"><div class="detail-toolbar"><label>${rows.length} components${hasSubs ? " · sub-categories stay in place" : ""}</label>
+    <select aria-label="Sort components" data-detail-sort="${main.idx}">${opt("source","Source order")}${opt("yoy-desc","YoY · high to low")}${opt("yoy-asc","YoY · low to high")}${opt("mom-desc","MoM · high to low")}${opt("mom-asc","MoM · low to high")}${opt("weight-desc","Weight · high to low")}</select></div>
+    <div class="detail-table-wrap"><table class="detail-table"><thead><tr><th>Category / item</th><th>Weight</th><th>YoY</th><th>MoM</th></tr></thead><tbody>${body}</tbody></table></div></div>`;
+}
+
+function categoryCardHtml(row) {
+  const y = rate(row, "yoy"), m = rate(row, "mom"), expanded = state.expanded.has(row.idx);
+  return `<article class="category-card ${expanded ? "expanded" : ""}" data-id="${row.idx}">
+    <div class="category-top" role="button" tabindex="0" aria-expanded="${expanded}" data-expand="${row.idx}">
+      <div class="category-title-row"><div class="category-name">${escapeHtml(row.label)}</div><div class="category-weight">${pct((row.weight || 0) * 100)} weight</div></div>
+      <div class="category-metrics"><div class="category-metric"><strong>${pct(y)}</strong><span>Annual · YoY</span></div><div class="category-metric"><strong>${pct(m)}</strong><span>Monthly · MoM</span></div></div></div>
+    <div class="category-card-actions"><button class="history-button" data-history="${row.idx}"><i data-lucide="chart-no-axes-combined"></i> Historical</button><span class="expand-hint" data-expand="${row.idx}">${expanded ? "Hide details" : "Explore components"} <i data-lucide="chevron-down"></i></span></div>
+    ${expanded ? detailHtml(row) : ""}</article>`;
+}
+
+function renderCategories() {
+  const sort = $("categorySort").value, cmp = comparator(sort);
+  const mainCmp = sort === "weight-desc" ? (a, b) => (b.weight || 0) - (a.weight || 0) : cmp;
+  const sorted = getMainRows().slice().sort(mainCmp);
+  $("categoryGrid").innerHTML = sorted.map(categoryCardHtml).join("");
+  icons();
+}
+function refreshCard(idx) {
+  const row = state.rows[idx], card = document.querySelector(`.category-card[data-id="${idx}"]`);
+  if (!row || !card) return renderCategories();
+  card.outerHTML = categoryCardHtml(row); icons();
+}
+function toggleExpanded(idx) {
+  if (state.expanded.has(idx)) state.expanded.delete(idx); else state.expanded.add(idx);
+  refreshCard(idx);
+}
+
+/* ------------------------------------------------------------------ *
+ *  4) Category history: one line, the category's own inflation
+ * ------------------------------------------------------------------ */
+function openHistory(row) {
+  state.historyCategory = row; state.historyRange = 12;
+  $("historyTitle").textContent = row.label;
+  $("historySubtitle").textContent = `${pct((row.weight || 0) * 100)} of the CPI basket`;
+  document.querySelectorAll(".history-ranges button").forEach(b => b.classList.toggle("active", b.dataset.range === "12"));
+  $("historyModal").classList.remove("hidden"); document.body.style.overflow = "hidden";
+  renderHistory(); icons();
+}
+function closeHistory() { $("historyModal").classList.add("hidden"); document.body.style.overflow = ""; }
+
+function renderHistory() {
+  const row = state.historyCategory; if (!row) return;
+  const period = $("historyMeasure").value, start = rangeStart(state.historyRange, period);
+  const labels = [], data = [];
+  for (let i = start; i <= state.latestIndex; i++) { labels.push(monthLabel(state.dates[i])); data.push(rate(row, period, i)); }
+  state.historyChart = makeLineChart($("historyChart"), state.historyChart, {
+    labels, data, color: period === "yoy" ? LINE_BLUE : LINE_ORANGE,
+    seriesName: `${row.label} · ${period === "yoy" ? "YoY" : "MoM"}`,
+    axisTitle: period === "yoy" ? "YoY inflation (%)" : "MoM inflation (%)",
+    tickOpts: { labelW: 80, anchor: "end" }
+  });
+  $("historyRangeLabel").textContent = `${labels[0] || "—"} – ${labels[labels.length - 1] || "—"}`;
+}
+
+/* ------------------------------------------------------------------ *
+ *  5 + 6) Contribution analysis: stacked bars, ordered by latest-month contribution
+ * ------------------------------------------------------------------ */
+function populateParentSelect() {
+  const sel = $("parentSelect"), keep = sel.value;
+  const parents = selectedParents();
+  sel.innerHTML = parents.map(r => `<option value="${r.idx}">${escapeHtml(r.label)}</option>`).join("");
+  if (keep && parents.some(r => String(r.idx) === keep)) sel.value = keep;
+  $("parentSelectWrap").classList.toggle("hidden", $("contributionLevel").value === "main");
+}
+
+const totalLabelsPlugin = {
+  id: "totalLabels",
+  afterDatasetsDraw(chart, args, opts) {
+    const totals = (opts && opts.totals) || [], { ctx, scales: { x, y }, chartArea } = chart, n = totals.length;
+    if (!n) return;
+    const slot = chartArea.width / n, step = Math.max(1, Math.ceil(40 / slot));
+    ctx.save();
+    // zero baseline (axis line only, no grid)
+    ctx.strokeStyle = "#cdd6e2"; ctx.lineWidth = 1; ctx.beginPath();
+    const y0 = y.getPixelForValue(0); ctx.moveTo(chartArea.left, y0); ctx.lineTo(chartArea.right, y0); ctx.stroke();
+    ctx.fillStyle = INK; ctx.font = `700 ${slot < 26 ? 9 : 11}px "DM Sans", sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = "bottom";
+    for (let i = 0; i < n; i++) {
+      if ((n - 1 - i) % step !== 0 || !Number.isFinite(totals[i])) continue;
+      let top = 0;
+      chart.data.datasets.forEach((ds, di) => { if (chart.isDatasetVisible(di) && Number.isFinite(ds.data[i]) && ds.data[i] > 0) top += ds.data[i]; });
+      ctx.fillText(pct(totals[i]), x.getPixelForValue(i), y.getPixelForValue(top) - 6);
+    }
+    ctx.restore();
+  }
+};
+
+function renderContribution() {
+  if (!state.rows.length) return;
+  const period = $("contributionMeasure").value, level = $("contributionLevel").value, mainLevel = level === "main";
+  $("parentSelectWrap").classList.toggle("hidden", mainLevel);
+
+  let rows, parent = null, totalRow;
+  if (mainLevel) { rows = getMainRows(); totalRow = getAllRow(); }
+  else {
+    parent = state.rows[Number($("parentSelect").value)] || selectedParents()[0];
+    rows = parent ? getChildRows(parent) : []; totalRow = parent;
+  }
+  if (!totalRow || !rows.length) return;
+
+  const start = rangeStart(state.contributionRange, period);
+  const labels = [], totals = [];
+  const series = rows.map((row, i) => ({ row, color: PALETTE[i % PALETTE.length], data: [] }));
+  for (let idx = start; idx <= state.latestIndex; idx++) {
+    labels.push(monthLabel(state.dates[idx])); totals.push(rate(totalRow, period, idx));
+    series.forEach(s => s.data.push(mainLevel ? mainContrib(s.row, period, idx) : childContrib(s.row, parent, period, idx)));
+  }
+
+  // Largest contributor (latest month) first; the chart stacks the largest at the top, the smallest at the bottom.
+  const latestOf = s => { const v = s.data[s.data.length - 1]; return Number.isFinite(v) ? v : -Infinity; };
+  const ranked = series.slice().sort((a, b) => latestOf(b) - latestOf(a));
+  const stackOrder = ranked.slice().reverse();
+
+  const dense = labels.length > 30;   // thin bars: use hairline separators so small slices stay visible
+  const datasets = stackOrder.map(s => ({
+    type: "bar", label: s.row.label, data: s.data, stack: "contrib",
+    backgroundColor: s.color, borderColor: "#fff", borderWidth: dense ? 0.4 : 1.5, borderRadius: dense ? 0 : 2, borderSkipped: false,
+    hoverBorderColor: INK, hoverBorderWidth: 1.5, barPercentage: .78, categoryPercentage: .88
+  }));
+  const maxTop = Math.max(...labels.map((_, i) => Math.max(totals[i] || 0, datasets.reduce((t, d) => t + (d.data[i] > 0 ? d.data[i] : 0), 0))), 0);
+
+  if (state.contributionChart) state.contributionChart.destroy();
+  state.contributionChart = new Chart($("contributionChart"), {
+    type: "bar", data: { labels, datasets }, plugins: [totalLabelsPlugin],
+    options: {
+      responsive: true, maintainAspectRatio: false, layout: { padding: { top: 24 } },
+      interaction: { mode: "nearest", intersect: true },          // hover only the slice under the cursor
+      plugins: {
+        legend: { display: false },
+        tooltip: { padding: 10, backgroundColor: "rgba(23,43,77,.94)", boxPadding: 4, titleFont: { weight: "600" },
+                   callbacks: { label: c => `${c.dataset.label}: ${pp(c.raw)}` } },
+        totalLabels: { totals }
+      },
+      scales: {
+        x: { stacked: true, grid: { display: false }, border: { display: false },
+             ticks: { autoSkip: false, maxRotation: 0, color: MUTED, font: { size: 10 }, callback: sparseTicks({ labelW: 70, maxLabels: 6, anchor: "start" }) } },
+        y: { stacked: true, grid: { display: false }, border: { display: false }, suggestedMax: maxTop * 1.03,
+             title: { display: true, text: "Contribution (percentage points)", color: MUTED, font: { size: 10 } },
+             ticks: { color: MUTED, font: { size: 10 }, callback: v => r1(v) } }
+      }
+    }
+  });
+
+  $("rangeLabel").textContent = `${labels[0] || "—"} – ${labels[labels.length - 1] || "—"}`;
+  const what = mainLevel ? "main category" : "sub-item", into = mainLevel ? "headline inflation" : `${parent.label} inflation`;
+  const base = mainLevel ? "previous-period All Items CPI index" : `previous-period ${parent.label} CPI index`;
+  const weight = mainLevel ? "rebased main-category weight" : "sub-item weight";
+  $("contributionNote").textContent =
+    `Bars show each ${what}'s contribution to ${into} in percentage points, ordered from the largest contributor at the top to the smallest at the bottom (based on the latest month). ` +
+    `Labels above columns show overall inflation${mainLevel ? "" : " for the selected category"}. When many months are shown, labels appear every few months to reduce clutter.`;
+}
+
+/* ------------------------------------------------------------------ *
+ *  Data loading
+ * ------------------------------------------------------------------ */
+function parseCsv(text) {
+  const parsed = Papa.parse(text, { header: true, skipEmptyLines: true, dynamicTyping: false,
+    transformHeader: h => String(h).replace(/^\uFEFF/, "").trim().replace(/\s+/g, " ") });
+  if (parsed.errors.length) console.warn("CSV parsing warnings", parsed.errors);
+  const fields = parsed.meta.fields || [], dateFields = fields.filter(f => parseDate(f));
+  state.dates = dateFields.map(parseDate);
+  state.rows = parsed.data
+    .map(r => ({ family: r["category family"], name: r["Category"], subWeight: num(r["sub items weights"]), weight: num(r["Weights Rebased"]), values: dateFields.map(k => num(r[k])) }))
+    .filter(r => String(r.name || "").trim())
+    .map((r, i) => normalizeRow(r, i));
+  state.latestIndex = state.dates.length - 1;
+}
+
+async function loadData() {
+  setStatus("Fetching latest CSV…"); $("refreshBtn").disabled = true;
+  try {
+    const response = await fetch(DATA_URL, { cache: "no-store" });
+    if (!response.ok) throw new Error(`GitHub returned ${response.status}`);
+    parseCsv(await response.text());
+    if (!state.rows.length || !state.dates.length) throw new Error("No valid CPI rows or monthly columns were found.");
+    state.expanded.clear();
+    populateOverview(); buildTrendCharts(); renderCategories(); populateParentSelect(); renderContribution();
+    $("updatedAt").textContent = `Source: GitHub CSV · loaded ${new Date().toLocaleString()}`;
+    setStatus(`${state.rows.length} series loaded`, true);
+  } catch (err) {
+    console.error(err); setStatus("Data could not load", false);
+    $("categoryGrid").innerHTML = `<div class="error-card"><b>Unable to load the source CSV.</b><br>Check that the GitHub file is public and that the URL is correct, then refresh. ${escapeHtml(err.message)}</div>`;
+    toast("Could not fetch the CSV from GitHub.");
+  } finally { $("refreshBtn").disabled = false; icons(); }
+}
+
+/* ------------------------------------------------------------------ *
+ *  Events
+ * ------------------------------------------------------------------ */
+function bindGlobalEvents() {
+  $("refreshBtn").addEventListener("click", loadData);
+  $("categorySort").addEventListener("change", renderCategories);
+
+  const grid = $("categoryGrid");
+  grid.addEventListener("click", e => {
+    const h = e.target.closest("[data-history]");
+    if (h) { e.stopPropagation(); const row = state.rows[Number(h.dataset.history)]; if (row) openHistory(row); return; }
+    const x = e.target.closest("[data-expand]");
+    if (x) toggleExpanded(Number(x.dataset.expand));
+  });
+  grid.addEventListener("keydown", e => {
+    const x = e.target.closest(".category-top[data-expand]");
+    if (x && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); toggleExpanded(Number(x.dataset.expand)); }
+  });
+  grid.addEventListener("change", e => {
+    const s = e.target.closest("[data-detail-sort]");
+    if (s) { const idx = Number(s.dataset.detailSort); state.sorts[idx] = s.value; refreshCard(idx); }
+  });
+
+  $("contributionMeasure").addEventListener("change", renderContribution);
+  $("contributionLevel").addEventListener("change", () => { populateParentSelect(); renderContribution(); });
+  $("parentSelect").addEventListener("change", renderContribution);
+  const rangeBtns = document.querySelectorAll(".range-buttons:not(.history-ranges) button");
+  rangeBtns.forEach(b => b.addEventListener("click", () => {
+    state.contributionRange = b.dataset.range; rangeBtns.forEach(x => x.classList.toggle("active", x === b)); renderContribution();
+  }));
+  const histBtns = document.querySelectorAll(".history-ranges button");
+  histBtns.forEach(b => b.addEventListener("click", () => {
+    state.historyRange = b.dataset.range; histBtns.forEach(x => x.classList.toggle("active", x === b)); renderHistory();
+  }));
+  $("historyMeasure").addEventListener("change", renderHistory);
+  document.querySelectorAll("[data-close-modal]").forEach(el => el.addEventListener("click", closeHistory));
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("historyModal").classList.contains("hidden")) closeHistory(); });
+}
+
+applyChartDefaults();
+renderCommentary();
+bindGlobalEvents();
+loadData();
+})();
+  </script>
+</body>
+</html>
